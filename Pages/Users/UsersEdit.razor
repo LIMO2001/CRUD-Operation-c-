@@ -1,0 +1,61 @@
+@page "/users/edit/{Id:int}"
+@inject CRUDOPproject.Data.AppDbContext _context
+@inject NavigationManager Nav
+@using CRUDOPproject.Models
+@using Microsoft.AspNetCore.Components.Forms
+
+<h3>Edit User</h3>
+
+@if (user == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <EditForm Model="@user" OnValidSubmit="HandleValidSubmit" FormName="EditUserForm">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label>Username</label>
+        <InputText class="form-control" @bind-value="user.Username" />
+    </div>
+    <div class="mb-3">
+        <label>Email</label>
+        <InputText class="form-control" @bind-Value="user.Email" />
+    </div>
+    <div class="mb-3">
+        <label>Role</label>
+        <InputText class="form-control" @bind-Value="user.Role" />
+    </div>
+
+    <button type="submit" class="btn btn-primary"> Update</button>
+    <button type="button" class="btn btn-secondary ms-2" @onclick="GoBack">⬅ Back</button>
+</EditForm>
+
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+    private User? user;
+
+    protected override void OnInitialized()
+    {
+        user = _context.Users.Find(Id);
+    }
+
+    private void HandleValidSubmit()
+    {
+        if (user != null)
+        {
+            _context.Users.Update(user);
+            _context.SaveChanges();
+            Nav.NavigateTo("/users");
+        }
+    }
+
+    private void GoBack()
+    {
+        Nav.NavigateTo("/users");
+    }
+}

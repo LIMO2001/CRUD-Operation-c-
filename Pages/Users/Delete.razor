@@ -1,0 +1,53 @@
+@page "/users/delete/{Id:int}"
+@inject CRUDOPproject.Data.AppDbContext _context
+@inject NavigationManager Nav
+@using CRUDOPproject.Models
+
+<h3>Delete User</h3>
+
+@if (user is null)
+{
+    <div class="alert alert-danger">User not found.</div>
+}
+else
+{
+    <div class="card shadow p-4">
+        <p>Are you sure you want to delete <strong>@user.Username</strong>?</p>
+        <button class="btn btn-danger me-2" @onclick="async () => await DeleteUser()">Yes, Delete</button>
+        <button class="btn btn-secondary" @onclick="Cancel">⬅ Cancel</button>
+    </div>
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+    private User? user;
+
+    protected override async Task OnInitializedAsync()
+    {
+        user = await _context.Users.FindAsync(Id);
+    }
+
+    private async Task DeleteUser()
+    {
+        Console.WriteLine("🛠 Delete button clicked"); // Debug
+
+        var entity = await _context.Users.FindAsync(Id);
+        if (entity is not null)
+        {
+            _context.Users.Remove(entity);
+            await _context.SaveChangesAsync();
+
+            // Redirect back with a success message
+            Nav.NavigateTo("/users?msg=User deleted successfully", forceLoad: true);
+        }
+        else
+        {
+            Console.WriteLine($"⚠ User with Id={Id} not found.");
+        }
+    }
+
+    private void Cancel()
+    {
+        Nav.NavigateTo("/users");
+    }
+}

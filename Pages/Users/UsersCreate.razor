@@ -1,0 +1,44 @@
+@page "/users/create"
+@inject CRUDOPproject.Data.AppDbContext _context
+@inject NavigationManager Nav
+@using CRUDOPproject.Models
+@using Microsoft.AspNetCore.Components.Forms
+
+<h3>Create User</h3>
+
+<div class="card shadow p-4">
+    <EditForm Model="@user" OnValidSubmit="HandleValidSubmit" FormName="CreateUserForm">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label>Username</label>
+        <InputText class="form-control" @bind-Value="user.Username" />
+    </div>
+    <div class="mb-3">
+        <label>Email</label>
+        <InputText class="form-control" @bind-Value="user.Email" />
+    </div>
+    <div class="mb-3">
+        <label>Role</label>
+        <InputText class="form-control" @bind-Value="user.Role" />
+    </div>
+
+    <button type="submit" class="btn btn-success"> Save</button>
+    <button type="button" class="btn btn-secondary ms-2" @onclick="GoBack">⬅ Back</button>
+</EditForm>
+
+</div>
+
+@code {
+    private User user = new();
+
+    private async Task HandleValidSubmit()
+    {
+        _context.Users.Add(user);
+        await _context.SaveChangesAsync();
+        Nav.NavigateTo("/users");
+    }
+
+    private void GoBack() => Nav.NavigateTo("/users");
+}
